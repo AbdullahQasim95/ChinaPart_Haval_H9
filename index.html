@@ -69,7 +69,7 @@
 <body>
 
   <header>
-    <img src="ChinaPartLogo.jpg" alt="China Parts Logo">
+    <img src="Images/ChinaPartLogo.jpg" alt="China Parts Logo">
   </header>
 
   <div class="gallery">
@@ -83,24 +83,42 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const gallery = document.querySelector('.gallery');
-      const folder = '.';
+      const folder = 'Images';
       const startIndex = 1;
       const endIndex = 104;
       const extension = 'png';
+      const batchSize = 12; // Number of images to load per scroll
+      let currentIndex = startIndex;
+      let loading = false;
 
-      for (let i = startIndex; i <= endIndex; i++) {
-        const src = `${folder}/${i}.${extension}`;
-        const img = document.createElement('img');
-        img.src = src;
-        img.alt = `Part ${i}`;
-        img.loading = 'lazy';
-        img.onerror = () => img.remove();
-        gallery.appendChild(img);
+      function loadImages() {
+        if (loading) return;
+        loading = true;
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < batchSize && currentIndex <= endIndex; i++, currentIndex++) {
+          const src = `${folder}/${currentIndex}.${extension}`;
+          const img = document.createElement('img');
+          img.src = src;
+          img.alt = `Part ${currentIndex}`;
+          img.loading = 'lazy';
+          img.onerror = () => img.remove();
+          fragment.appendChild(img);
+        }
+        gallery.appendChild(fragment);
+        loading = false;
       }
+
+      // Initial load
+      loadImages();
+
+      // Load more images as user scrolls near the bottom
+      window.addEventListener('scroll', () => {
+        if ((window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 300)) {
+          loadImages();
+        }
+      });
     });
   </script>
 
 </body>
 </html>
-
-
